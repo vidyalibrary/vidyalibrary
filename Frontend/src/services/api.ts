@@ -2,9 +2,9 @@ import axios from 'axios';
 
 // Determine the API URL based on the environment
 const API_URL = window.cordova
-  ? 'https://librarymanage-sm1b.onrender.com/api' // Production server for mobile
+  ? 'https://vidyalibrary.onrender.com/api' // Production server for mobile
   : process.env.NODE_ENV === 'production'
-    ? 'https://librarymanage-sm1b.onrender.com/api' // Production server for web
+    ? 'https://vidyalibrary.onrender.com/api' // Production server for web
     : 'http://localhost:3000/api';
 const apiClient = axios.create({
   baseURL: API_URL,
