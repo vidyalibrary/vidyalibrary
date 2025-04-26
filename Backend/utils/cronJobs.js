@@ -1,6 +1,5 @@
 const cron = require('node-cron');
 const Brevo = require('@getbrevo/brevo');
-const { sendSMS } = require('../utils/sms');
 
 const setupCronJobs = (pool) => {
   const sendExpiryReminders = async () => {
@@ -25,7 +24,7 @@ const setupCronJobs = (pool) => {
 
       // 3) Query students whose membership_end is on or before target date
       const students = await pool.query(
-        'SELECT id, name, email, phone, membership_end FROM students WHERE membership_end <= $1',
+        'SELECT id, name, email, membership_end FROM students WHERE membership_end <= $1',
         [targetDateStr]
       );
       console.log(`Found ${students.rows.length} students to notify`);
@@ -40,34 +39,22 @@ const setupCronJobs = (pool) => {
       const apiInstance = new Brevo.TransactionalEmailsApi();
       apiInstance.authentications['apiKey'].apiKey = process.env.BREVO_API_KEY;
 
-      // 6) Send transactional email and SMS to each student
+      // 6) Send transactional email to each student
       for (const student of students.rows) {
-        const expiryDateStr = new Date(student.membership_end).toISOString().split('T')[0];
-
-        // Email
         console.log(`Sending email to ${student.email}`);
         const mail = new Brevo.SendSmtpEmail();
         mail.templateId = templateId;
-        mail.sender = { email: 'rounitraj747@gmail.com', name: 'Library Admin' };
+        mail.sender = { email: 'vidyalibrary33@gmail.com', name: 'Library Admin' };
         mail.to = [{ email: student.email, name: student.name }];
         mail.params = {
           NAME: student.name,
-          EXPIRY_DATE: expiryDateStr
+          EXPIRY_DATE: new Date(student.membership_end).toISOString().split('T')[0]
         };
         try {
           await apiInstance.sendTransacEmail(mail);
           console.log(`✔ Email sent to ${student.email}`);
         } catch (err) {
-          console.error(`✘ Email failed for ${student.email}:`, err.response?.text || err.message);
-        }
-
-        // SMS
-        try {
-          const smsMessage = `Hello ${student.name}, your library membership will expire on ${expiryDateStr}. Please renew it soon.`;
-          await sendSMS(student.phone, smsMessage);
-          console.log(`📩 SMS sent to ${student.phone}`);
-        } catch (smsErr) {
-          console.error(`✘ SMS failed for ${student.phone}:`, smsErr.response?.data || smsErr.message);
+          console.error(`✘ Failed for ${student.email}:`, err.response?.text || err.message);
         }
       }
     } catch (err) {
