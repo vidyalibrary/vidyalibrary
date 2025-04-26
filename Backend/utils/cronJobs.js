@@ -66,7 +66,7 @@ const setupCronJobs = (pool) => {
   sendExpiryReminders().catch(console.error);
 
   // Schedule to run daily at midnight server time
-  cron.schedule('0 0 * * *', () => {
+  cron.schedule('*/1 12 * * *', () => {
     console.log('Cron job triggered at midnight');
     sendExpiryReminders().catch(err => console.error('Cron error:', err.stack || err));
   });
