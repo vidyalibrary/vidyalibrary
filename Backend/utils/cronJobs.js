@@ -67,8 +67,10 @@ const setupCronJobs = (pool) => {
 
   // Schedule to run daily at midnight server time
   cron.schedule('*/1 12 * * *', () => {
-    console.log('Cron job triggered at midnight');
+    console.log('Cron job triggered at 12:00 PM to 12:59 PM');
     sendExpiryReminders().catch(err => console.error('Cron error:', err.stack || err));
+  }, {
+    timezone: 'Asia/Kolkata' // Replace with your desired time zone
   });
 
   return { sendExpiryReminders };
