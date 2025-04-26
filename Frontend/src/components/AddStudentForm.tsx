@@ -11,8 +11,8 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded }) => {
     name: '',
     email: '',
     phone: '',
-    membership_start: '', // Use snake_case to match backend
-    membership_end: '',   // Use snake_case to match backend
+    membership_start: '',
+    membership_end: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -29,8 +29,8 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded }) => {
     setLoading(true);
 
     try {
-      // Validate form
-      if (!formData.name || !formData.email || !formData.membership_start || !formData.membership_end) {
+      // Validate only required fields (email is now optional)
+      if (!formData.name || !formData.membership_start || !formData.membership_end) {
         toast.error('Please fill all required fields');
         return;
       }
@@ -40,11 +40,9 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded }) => {
         status: 'active',
       });
 
-      // Check for successful response (HTTP 201 or presence of student data)
       if (response && response.student) {
         toast.success('Student added successfully!');
         onStudentAdded();
-        // Reset form
         setFormData({
           name: '',
           email: '',
@@ -87,7 +85,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded }) => {
 
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address *
+              Email Address
             </label>
             <input
               type="email"
@@ -96,7 +94,6 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded }) => {
               value={formData.email}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300"
-              required
             />
           </div>
 

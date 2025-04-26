@@ -135,13 +135,17 @@ const api = {
 
   addStudent: async (studentData: any) => {
     try {
-      const response = await apiClient.post('/students', studentData);
+      const formattedData = {
+        ...studentData,
+        email: studentData.email ? studentData.email : null,
+        phone: studentData.phone ? studentData.phone : null,
+      };
+      const response = await apiClient.post('/students', formattedData);
       return response.data;
     } catch (error) {
       throw error;
     }
   },
-
   updateStudent: async (id: string, studentData: any) => {
     try {
       const response = await apiClient.put(`/students/${id}`, studentData);

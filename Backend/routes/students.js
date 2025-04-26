@@ -85,15 +85,25 @@ module.exports = (pool) => {
   router.post('/', async (req, res) => {
     try {
       const { name, email, phone, address, membership_start, membership_end } = req.body;
-      const emailCheck = await pool.query('SELECT * FROM students WHERE email = $1', [email]);
-      if (emailCheck.rows.length > 0) {
-        return res.status(400).json({ message: 'Email already in use' });
+
+      // Sanitize email and phone to null if not provided or empty
+      const sanitizedEmail = email && email.trim() !== '' ? email : null;
+      const sanitizedPhone = phone && phone.trim() !== '' ? phone : null;
+      const sanitizedAddress = address && address.trim() !== '' ? address : null;
+
+      // Check email uniqueness only if email is provided
+      if (sanitizedEmail) {
+        const emailCheck = await pool.query('SELECT * FROM students WHERE email = $1', [sanitizedEmail]);
+        if (emailCheck.rows.length > 0) {
+          return res.status(400).json({ message: 'Email already in use' });
+        }
       }
+
       const status = new Date(membership_end) < new Date() ? 'expired' : 'active';
       const result = await pool.query(
         `INSERT INTO students (name, email, phone, address, status, membership_start, membership_end) 
          VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-        [name, email, phone || null, address || null, status, membership_start, membership_end]
+        [name, sanitizedEmail, sanitizedPhone, sanitizedAddress, status, membership_start, membership_end]
       );
       res.status(201).json({ 
         message: 'Student added successfully', 
@@ -109,12 +119,20 @@ module.exports = (pool) => {
     try {
       const { id } = req.params;
       const { name, email, phone, address, membership_start, membership_end } = req.body;
-      if (email) {
-        const emailCheck = await pool.query('SELECT * FROM students WHERE email = $1 AND id != $2', [email, id]);
+
+      // Sanitize email and phone to null if not provided or empty
+      const sanitizedEmail = email && email.trim() !== '' ? email : null;
+      const sanitizedPhone = phone && phone.trim() !== '' ? phone : null;
+      const sanitizedAddress = address && address.trim() !== '' ? address : null;
+
+      // Check email uniqueness only if email is provided
+      if (sanitizedEmail) {
+        const emailCheck = await pool.query('SELECT * FROM students WHERE email = $1 AND id != $2', [sanitizedEmail, id]);
         if (emailCheck.rows.length > 0) {
           return res.status(400).json({ message: 'Email already in use by another student' });
         }
       }
+
       const status = new Date(membership_end) < new Date() ? 'expired' : 'active';
       const result = await pool.query(
         `UPDATE students SET 
@@ -126,7 +144,7 @@ module.exports = (pool) => {
          membership_start = COALESCE($6, membership_start),
          membership_end = COALESCE($7, membership_end)
          WHERE id = $8 RETURNING *`,
-        [name, email, phone, address, status, membership_start, membership_end, id]
+        [name, sanitizedEmail, sanitizedPhone, sanitizedAddress, status, membership_start, membership_end, id]
       );
       if (result.rows.length === 0) {
         return res.status(404).json({ message: 'Student not found' });
