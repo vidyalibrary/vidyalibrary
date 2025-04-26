@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom'; // Added for navigation
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, Calendar as CalendarIcon, Menu } from 'lucide-react';
+import { Plus, Trash2, Calendar as CalendarIcon, Menu, ArrowLeft } from 'lucide-react'; // Added ArrowLeft icon
 import { toast } from 'sonner';
 import api from '../services/api';
 
@@ -39,6 +40,7 @@ const formatTime = (timeString: string | null | undefined): string => {
 };
 
 const Schedule = () => {
+  const navigate = useNavigate(); // Added for navigation
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [events, setEvents] = useState<ScheduleEvent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -174,9 +176,20 @@ const Schedule = () => {
         <Navbar />
         <div className="flex-1 overflow-y-auto p-6">
           <div className="max-w-7xl mx-auto">
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">Schedule</h1>
-              <p className="text-gray-500 dark:text-gray-400">Manage your daily activities and classes</p>
+            <div className="mb-6 flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate(-1)} // Go back to the previous page
+                className="p-2"
+              >
+                <ArrowLeft size={20} />
+                <span className="sr-only">Go back</span>
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200">Schedule</h1>
+                <p className="text-gray-500 dark:text-gray-400">Manage your daily activities and classes</p>
+              </div>
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
               <div className="md:col-span-1">

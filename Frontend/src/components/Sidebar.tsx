@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Users, Calendar, Settings, ChevronRight, UserCheck, AlertTriangle, Menu, X } from 'lucide-react';
 import { useMediaQuery } from 'react-responsive';
+import logo from './vidyalib.png'; // Adjust the path based on your project structure
 
 const Sidebar = () => {
   const location = useLocation();
@@ -44,7 +45,7 @@ const Sidebar = () => {
         <div className="p-4 flex items-center justify-between">
           {!effectiveIsCollapsed && (
             <div className="flex items-center gap-2">
-              <div className="bg-gradient-radial from-purple-300 to-orange-200 h-10 w-10 rounded-full"></div>
+              <img src={logo} alt="Vidya Library Logo" className="h-10 w-10" />
               <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-orange-400 text-transparent bg-clip-text">
                 Vidya Library
               </h1>
