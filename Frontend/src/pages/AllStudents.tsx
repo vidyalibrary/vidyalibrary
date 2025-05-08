@@ -49,9 +49,10 @@ const AllStudents = () => {
     setCurrentPage(1);
   }, [searchTerm]);
 
+  // Fix: Handle null/undefined phone by providing a fallback empty string
   const filteredStudents = students.filter((student: any) =>
     student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.phone.toLowerCase().includes(searchTerm.toLowerCase())
+    (student.phone || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const indexOfLastStudent = currentPage * studentsPerPage;
@@ -120,7 +121,7 @@ const AllStudents = () => {
                         {currentStudents.map((student: any) => (
                           <TableRow key={student.id}>
                             <TableCell>{student.name}</TableCell>
-                            <TableCell className="hidden md:table-cell">{student.phone}</TableCell>
+                            <TableCell className="hidden md:table-cell">{student.phone || 'N/A'}</TableCell>
                             <TableCell>
                               <span
                                 className={`px-2 py-1 rounded-full text-xs ${
